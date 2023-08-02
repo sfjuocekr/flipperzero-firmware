@@ -9,7 +9,8 @@ static void loader_cli_print_usage() {
     printf("loader <cmd> <args>\r\n");
     printf("Cmd list:\r\n");
     printf("\tlist\t - List available applications\r\n");
-    printf("\topen <Application Name:string>\t - Open application by name\r\n");
+    printf(
+        "\topen \"<Application Name:string>\" \"<parameter:string>\"\t - Open application by name with (optional) parameter\r\n");
     printf("\tinfo\t - Show loader state\r\n");
 }
 
@@ -18,10 +19,15 @@ static void loader_cli_list() {
     for(size_t i = 0; i < FLIPPER_APPS_COUNT; i++) {
         printf("\t%s\r\n", FLIPPER_APPS[i].name);
     }
+    for(size_t i = 0; i < FLIPPER_EXTERNAL_APPS_COUNT; i++) {
+        printf("\t%s\r\n", FLIPPER_EXTERNAL_APPS[i].name);
+    }
     printf("Settings:\r\n");
     for(size_t i = 0; i < FLIPPER_SETTINGS_APPS_COUNT; i++) {
         printf("\t%s\r\n", FLIPPER_SETTINGS_APPS[i].name);
     }
+    printf(
+        "For external applications, specify full path to '.fap' file.\r\nExample: \"/ext/apps/Main/clock.fap\"");
 }
 
 static void loader_cli_info(Loader* loader) {
@@ -35,15 +41,18 @@ static void loader_cli_info(Loader* loader) {
 
 static void loader_cli_open(FuriString* args, Loader* loader) {
     FuriString* app_name = furi_string_alloc();
+    FuriString* param = furi_string_alloc();
 
     do {
         if(!args_read_probably_quoted_string_and_trim(args, app_name)) {
             printf("No application provided\r\n");
             break;
         }
-        furi_string_trim(args);
+        args_read_probably_quoted_string_and_trim(args, param);
 
-        const char* args_str = furi_string_get_cstr(args);
+        furi_string_trim(param);
+
+        const char* args_str = furi_string_get_cstr(param);
         if(strlen(args_str) == 0) {
             args_str = NULL;
         }
@@ -55,6 +64,7 @@ static void loader_cli_open(FuriString* args, Loader* loader) {
             printf("%s\r\n", furi_string_get_cstr(error_message));
         }
         furi_string_free(error_message);
+
     } while(false);
 
     furi_string_free(app_name);

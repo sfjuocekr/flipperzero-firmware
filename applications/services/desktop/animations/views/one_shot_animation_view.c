@@ -1,4 +1,3 @@
-
 #include "one_shot_animation_view.h"
 #include <furi.h>
 #include <portmacro.h>
@@ -65,9 +64,9 @@ static bool one_shot_view_input(InputEvent* event, void* context) {
     if(!consumed) {
         if(event->key == InputKeyRight) {
             /* Right button reserved for animation activation, so consume */
-            consumed = true;
             if(event->type == InputTypeShort) {
                 if(view->interact_callback) {
+                    consumed = true;
                     view->interact_callback(view->interact_callback_context);
                 }
             }

@@ -1,4 +1,5 @@
 #include "../subghz_i.h"
+#include <assets_icons.h>
 #include "../helpers/subghz_custom_event.h"
 
 void subghz_scene_delete_success_popup_callback(void* context) {
@@ -28,6 +29,7 @@ bool subghz_scene_delete_success_on_event(void* context, SceneManagerEvent event
         if(event.event == SubGhzCustomEventSceneDeleteSuccess) {
             if(scene_manager_search_and_switch_to_previous_scene(
                    subghz->scene_manager, SubGhzSceneReadRAW)) {
+                scene_manager_next_scene(subghz->scene_manager, SubGhzSceneReadRAW);
             } else if(scene_manager_search_and_switch_to_previous_scene(
                           subghz->scene_manager, SubGhzSceneSaved)) {
             } else {

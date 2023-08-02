@@ -8,9 +8,6 @@
 
 #define TAG "SubGhzSetting"
 
-#define SUBGHZ_SETTING_FILE_TYPE "Flipper SubGhz Setting File"
-#define SUBGHZ_SETTING_FILE_VERSION 1
-
 #define FREQUENCY_FLAG_DEFAULT (1 << 31)
 #define FREQUENCY_MASK (0xFFFFFFFF ^ FREQUENCY_FLAG_DEFAULT)
 
@@ -18,26 +15,64 @@
 static const uint32_t subghz_frequency_list[] = {
     /* 300 - 348 */
     300000000,
+    302757000,
     303875000,
     304250000,
+    307000000,
+    307500000,
+    307800000,
+    309000000,
     310000000,
+    312000000,
+    312100000,
+    312200000,
+    313000000,
+    313850000,
+    314000000,
+    314350000,
+    314980000,
     315000000,
     318000000,
+    330000000,
+    345000000,
+    348000000,
+    350000000,
 
     /* 387 - 464 */
+    387000000,
     390000000,
     418000000,
+    430000000,
+    431000000,
+    431500000,
     433075000, /* LPD433 first */
+    433220000,
     433420000,
+    433657070,
+    433889000,
     433920000 | FREQUENCY_FLAG_DEFAULT, /* LPD433 mid */
+    434075000,
+    434176948,
+    434190000,
+    434390000,
     434420000,
+    434620000,
     434775000, /* LPD433 last channels */
     438900000,
+    440175000,
+    464000000,
+    467750000,
 
     /* 779 - 928 */
+    779000000,
     868350000,
+    868400000,
+    868800000,
+    868950000,
+    906400000,
     915000000,
     925000000,
+    928000000,
     0,
 };
 
@@ -45,114 +80,7 @@ static const uint32_t subghz_hopper_frequency_list[] = {
     310000000,
     315000000,
     318000000,
-    390000000,
-    433920000,
-    868350000,
-    0,
-};
-
-/* Europe and Russia */
-static const uint32_t subghz_frequency_list_region_eu_ru[] = {
-    /* 300 - 348 */
-    300000000,
-    303875000,
-    304250000,
-    310000000,
-    315000000,
-    318000000,
-
-    /* 387 - 464 */
-    390000000,
     418000000,
-    433075000, /* LPD433 first */
-    433420000,
-    433920000 | FREQUENCY_FLAG_DEFAULT, /* LPD433 mid */
-    434420000,
-    434775000, /* LPD433 last channels */
-    438900000,
-
-    /* 779 - 928 */
-    868350000,
-    915000000,
-    925000000,
-    0,
-};
-static const uint32_t subghz_hopper_frequency_list_region_eu_ru[] = {
-    310000000,
-    315000000,
-    318000000,
-    390000000,
-    433920000,
-    868350000,
-    0,
-};
-
-/* Region 0 */
-static const uint32_t subghz_frequency_list_region_us_ca_au[] = {
-    /* 300 - 348 */
-    300000000,
-    303875000,
-    304250000,
-    310000000,
-    315000000,
-    318000000,
-
-    /* 387 - 464 */
-    390000000,
-    418000000,
-    433075000, /* LPD433 first */
-    433420000,
-    433920000 | FREQUENCY_FLAG_DEFAULT, /* LPD433 mid */
-    434420000,
-    434775000, /* LPD433 last channels */
-    438900000,
-
-    /* 779 - 928 */
-    868350000,
-    915000000,
-    925000000,
-    0,
-};
-static const uint32_t subghz_hopper_frequency_list_region_us_ca_au[] = {
-    310000000,
-    315000000,
-    318000000,
-    390000000,
-    433920000,
-    868350000,
-    0,
-};
-
-static const uint32_t subghz_frequency_list_region_jp[] = {
-    /* 300 - 348 */
-    300000000,
-    303875000,
-    304250000,
-    310000000,
-    315000000,
-    318000000,
-
-    /* 387 - 464 */
-    390000000,
-    418000000,
-    433075000, /* LPD433 first */
-    433420000,
-    433920000 | FREQUENCY_FLAG_DEFAULT, /* LPD433 mid */
-    434420000,
-    434775000, /* LPD433 last channels */
-    438900000,
-
-    /* 779 - 928 */
-    868350000,
-    915000000,
-    925000000,
-    0,
-};
-static const uint32_t subghz_hopper_frequency_list_region_jp[] = {
-    310000000,
-    315000000,
-    318000000,
-    390000000,
     433920000,
     868350000,
     0,
@@ -168,10 +96,6 @@ ARRAY_DEF(SubGhzSettingCustomPresetItemArray, SubGhzSettingCustomPresetItem, M_P
 
 #define M_OPL_SubGhzSettingCustomPresetItemArray_t() \
     ARRAY_OPLIST(SubGhzSettingCustomPresetItemArray, M_POD_OPLIST)
-
-LIST_DEF(FrequencyList, uint32_t)
-
-#define M_OPL_FrequencyList_t() LIST_OPLIST(FrequencyList)
 
 typedef struct {
     SubGhzSettingCustomPresetItemArray_t data;
@@ -268,30 +192,10 @@ static void subghz_setting_load_default_region(
         instance, "FM476", subghz_device_cc1101_preset_2fsk_dev47_6khz_async_regs);
 }
 
+// Region check removed
 void subghz_setting_load_default(SubGhzSetting* instance) {
-    switch(furi_hal_version_get_hw_region()) {
-    case FuriHalVersionRegionEuRu:
-        subghz_setting_load_default_region(
-            instance,
-            subghz_frequency_list_region_eu_ru,
-            subghz_hopper_frequency_list_region_eu_ru);
-        break;
-    case FuriHalVersionRegionUsCaAu:
-        subghz_setting_load_default_region(
-            instance,
-            subghz_frequency_list_region_us_ca_au,
-            subghz_hopper_frequency_list_region_us_ca_au);
-        break;
-    case FuriHalVersionRegionJp:
-        subghz_setting_load_default_region(
-            instance, subghz_frequency_list_region_jp, subghz_hopper_frequency_list_region_jp);
-        break;
-
-    default:
-        subghz_setting_load_default_region(
-            instance, subghz_frequency_list, subghz_hopper_frequency_list);
-        break;
-    }
+    subghz_setting_load_default_region(
+        instance, subghz_frequency_list, subghz_hopper_frequency_list);
 }
 
 void subghz_setting_load(SubGhzSetting* instance, const char* file_path) {
@@ -374,13 +278,7 @@ void subghz_setting_load(SubGhzSetting* instance, const char* file_path) {
                 break;
             }
             if(flipper_format_read_uint32(fff_data_file, "Default_frequency", &temp_data32, 1)) {
-                for
-                    M_EACH(frequency, instance->frequencies, FrequencyList_t) {
-                        *frequency &= FREQUENCY_MASK;
-                        if(*frequency == temp_data32) {
-                            *frequency |= FREQUENCY_FLAG_DEFAULT;
-                        }
-                    }
+                subghz_setting_set_default_frequency(instance, temp_data32);
             }
 
             // custom preset (optional)
@@ -408,6 +306,16 @@ void subghz_setting_load(SubGhzSetting* instance, const char* file_path) {
     }
 }
 
+void subghz_setting_set_default_frequency(SubGhzSetting* instance, uint32_t frequency_to_setup) {
+    for
+        M_EACH(frequency, instance->frequencies, FrequencyList_t) {
+            *frequency &= FREQUENCY_MASK;
+            if(*frequency == frequency_to_setup) {
+                *frequency |= FREQUENCY_FLAG_DEFAULT;
+            }
+        }
+}
+
 size_t subghz_setting_get_frequency_count(SubGhzSetting* instance) {
     furi_assert(instance);
     return FrequencyList_size(instance->frequencies);
@@ -425,6 +333,9 @@ size_t subghz_setting_get_preset_count(SubGhzSetting* instance) {
 
 const char* subghz_setting_get_preset_name(SubGhzSetting* instance, size_t idx) {
     furi_assert(instance);
+    if(idx >= SubGhzSettingCustomPresetItemArray_size(instance->preset->data)) {
+        idx = 0;
+    }
     SubGhzSettingCustomPresetItem* item =
         SubGhzSettingCustomPresetItemArray_get(instance->preset->data, idx);
     return furi_string_get_cstr(item->custom_preset_name);
@@ -549,4 +460,36 @@ uint32_t subghz_setting_get_default_frequency(SubGhzSetting* instance) {
     furi_assert(instance);
     return subghz_setting_get_frequency(
         instance, subghz_setting_get_frequency_default_index(instance));
+}
+
+uint8_t subghz_setting_customs_presets_to_log(SubGhzSetting* instance) {
+    furi_assert(instance);
+#ifndef FURI_DEBUG
+    FURI_LOG_I(TAG, "Logging loaded presets allow only Debug build");
+#else
+    uint8_t count = 0;
+    FuriString* temp = furi_string_alloc();
+
+    FURI_LOG_I(TAG, "Loaded presets");
+    for
+        M_EACH(item, instance->preset->data, SubGhzSettingCustomPresetItemArray_t) {
+            furi_string_reset(temp);
+
+            for(uint8_t i = 0; i < item->custom_preset_data_size; i++) {
+                furi_string_cat_printf(temp, "%02u ", item->custom_preset_data[i]);
+            }
+
+            FURI_LOG_I(
+                TAG, "%u  -  %s", count + 1, furi_string_get_cstr(item->custom_preset_name));
+            FURI_LOG_I(TAG, "  Size: %u", item->custom_preset_data_size);
+            FURI_LOG_I(TAG, "  Data: %s", furi_string_get_cstr(temp));
+
+            count++;
+        }
+
+    furi_string_free(temp);
+
+    return count;
+#endif
+    return 0;
 }

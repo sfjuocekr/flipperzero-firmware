@@ -5,6 +5,8 @@
 #include <furi_hal_memory.h>
 #include <furi_hal_rtc.h>
 
+#include <cfw/private.h>
+
 #define TAG "Flipper"
 
 static void flipper_print_version(const char* target, const Version* version) {
@@ -45,6 +47,8 @@ void flipper_init() {
 
         furi_thread_start(thread);
     }
+
+    CFW_SETTINGS_LOAD();
 
     FURI_LOG_I(TAG, "Startup complete");
 }

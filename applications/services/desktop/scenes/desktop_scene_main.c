@@ -2,6 +2,7 @@
 #include <furi_hal.h>
 #include <applications.h>
 #include <assets_icons.h>
+#include <storage/storage.h>
 #include <loader/loader.h>
 
 #include "../desktop_i.h"
@@ -12,9 +13,15 @@
 
 #define TAG "DesktopSrv"
 
-#define MUSIC_PLAYER_APP EXT_PATH("/apps/Media/music_player.fap")
-#define SNAKE_GAME_APP EXT_PATH("/apps/Games/snake_game.fap")
-#define CLOCK_APP EXT_PATH("/apps/Tools/clock.fap")
+#define CLOCK_APP EXT_PATH("apps/Main/dab_timer.fap")
+#define DOOM_APP EXT_PATH("apps/Games/doom.fap")
+#define HEAP_DEFENCE_APP EXT_PATH("apps/Games/heap_defence.fap")
+#define IMPROVED_2048_APP EXT_PATH("apps/Games/2048_improved.fap")
+#define PASSPORT_APP EXT_PATH("apps/Settings/passport.fap")
+#define SNAKE_APP EXT_PATH("apps/Games/snake.fap")
+#define TETRIS_APP EXT_PATH("apps/Games/tetris.fap")
+#define ZOMBIEZ_APP EXT_PATH("apps/Games/zombiez.fap")
+#define JETPACK_APP EXT_PATH("apps/Games/jetpack.fap")
 
 static void desktop_scene_main_new_idle_animation_callback(void* context) {
     furi_assert(context);
@@ -67,14 +74,17 @@ static void
 
 static void desktop_scene_main_open_app_or_profile(Desktop* desktop, const char* path) {
     if(loader_start_with_gui_error(desktop->loader, path, NULL) != LoaderStatusOk) {
-        loader_start(desktop->loader, "Passport", NULL, NULL);
+        loader_start(desktop->loader, PASSPORT_APP, NULL, NULL);
     }
 }
 
 static void desktop_scene_main_start_favorite(Desktop* desktop, FavoriteApp* application) {
-    if(strlen(application->name_or_path) > 0) {
-        loader_start_with_gui_error(desktop->loader, application->name_or_path, NULL);
-    } else {
+    if(strlen(application->name_or_path) > 2) {
+        if(loader_start_with_gui_error(desktop->loader, application->name_or_path, NULL) !=
+           LoaderStatusOk) {
+            loader_start(desktop->loader, LOADER_APPLICATIONS_NAME, NULL, NULL);
+        }
+    } else if(strcmp(application->name_or_path, "d") != 0) {
         loader_start(desktop->loader, LOADER_APPLICATIONS_NAME, NULL, NULL);
     }
 }
@@ -115,6 +125,13 @@ bool desktop_scene_main_on_event(void* context, SceneManagerEvent event) {
             consumed = true;
         } break;
 
+        case DesktopMainEventOpenGamesMenu: {
+            Loader* loader = furi_record_open(RECORD_LOADER);
+            loader_show_gamesmenu(loader);
+            furi_record_close(RECORD_LOADER);
+            consumed = true;
+        } break;
+
         case DesktopMainEventOpenLockMenu:
             scene_manager_next_scene(desktop->scene_manager, DesktopSceneLockMenu);
             consumed = true;
@@ -122,6 +139,12 @@ bool desktop_scene_main_on_event(void* context, SceneManagerEvent event) {
 
         case DesktopMainEventOpenDebug:
             scene_manager_next_scene(desktop->scene_manager, DesktopSceneDebug);
+            consumed = true;
+            break;
+
+        case DesktopMainEventLock:
+            scene_manager_set_scene_state(desktop->scene_manager, DesktopSceneLockMenu, 0);
+            desktop_lock(desktop);
             consumed = true;
             break;
 
@@ -137,7 +160,6 @@ bool desktop_scene_main_on_event(void* context, SceneManagerEvent event) {
             consumed = true;
             break;
         }
-
         case DesktopMainEventOpenFavoritePrimary:
             DESKTOP_SETTINGS_LOAD(&desktop->settings);
             desktop_scene_main_start_favorite(desktop, &desktop->settings.favorite_primary);
@@ -146,6 +168,16 @@ bool desktop_scene_main_on_event(void* context, SceneManagerEvent event) {
         case DesktopMainEventOpenFavoriteSecondary:
             DESKTOP_SETTINGS_LOAD(&desktop->settings);
             desktop_scene_main_start_favorite(desktop, &desktop->settings.favorite_secondary);
+            consumed = true;
+            break;
+        case DesktopMainEventOpenFavoriteTertiary:
+            DESKTOP_SETTINGS_LOAD(&desktop->settings);
+            desktop_scene_main_start_favorite(desktop, &desktop->settings.favorite_tertiary);
+            consumed = true;
+            break;
+        case DesktopMainEventOpenFavoriteQuaternary:
+            DESKTOP_SETTINGS_LOAD(&desktop->settings);
+            desktop_scene_main_start_favorite(desktop, &desktop->settings.favorite_quaternary);
             consumed = true;
             break;
         case DesktopAnimationEventCheckAnimation:
@@ -158,24 +190,52 @@ bool desktop_scene_main_on_event(void* context, SceneManagerEvent event) {
             break;
         case DesktopAnimationEventInteractAnimation:
             if(!animation_manager_interact_process(desktop->animation_manager)) {
-                loader_start(desktop->loader, "Passport", NULL, NULL);
+                desktop_scene_main_open_app_or_profile(desktop, PASSPORT_APP);
             }
             consumed = true;
             break;
         case DesktopMainEventOpenPassport: {
-            loader_start(desktop->loader, "Passport", NULL, NULL);
+            desktop_scene_main_open_app_or_profile(desktop, PASSPORT_APP);
             break;
         }
-        case DesktopMainEventOpenGame: {
-            desktop_scene_main_open_app_or_profile(desktop, SNAKE_GAME_APP);
+        case DesktopMainEventOpenSnake: {
+            desktop_scene_main_open_app_or_profile(desktop, SNAKE_APP);
+            break;
+        }
+        case DesktopMainEventOpen2048: {
+            desktop_scene_main_open_app_or_profile(desktop, IMPROVED_2048_APP);
+            break;
+        }
+        case DesktopMainEventOpenZombiez: {
+            desktop_scene_main_open_app_or_profile(desktop, ZOMBIEZ_APP);
+            break;
+        }
+        case DesktopMainEventOpenTetris: {
+            desktop_scene_main_open_app_or_profile(desktop, TETRIS_APP);
+            break;
+        }
+        case DesktopMainEventOpenDOOM: {
+            desktop_scene_main_open_app_or_profile(desktop, DOOM_APP);
+            break;
+        }
+        case DesktopMainEventOpenHeap: {
+            desktop_scene_main_open_app_or_profile(desktop, HEAP_DEFENCE_APP);
+            break;
+        }
+        case DesktopMainEventOpenJetPack: {
+            desktop_scene_main_open_app_or_profile(desktop, JETPACK_APP);
             break;
         }
         case DesktopMainEventOpenClock: {
-            desktop_scene_main_open_app_or_profile(desktop, CLOCK_APP);
-            break;
-        }
-        case DesktopMainEventOpenMusicPlayer: {
-            desktop_scene_main_open_app_or_profile(desktop, MUSIC_PLAYER_APP);
+            Storage* storage = furi_record_open(RECORD_STORAGE);
+            if(storage_file_exists(storage, CLOCK_APP)) {
+                furi_record_close(RECORD_STORAGE);
+                desktop_scene_main_open_app_or_profile(desktop, CLOCK_APP);
+            } else {
+                furi_record_close(RECORD_STORAGE);
+                scene_manager_next_scene(desktop->scene_manager, DesktopSceneDebug);
+                consumed = true;
+            }
             break;
         }
         case DesktopLockedEventUpdate:

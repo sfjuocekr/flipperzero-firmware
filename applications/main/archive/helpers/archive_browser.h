@@ -3,7 +3,7 @@
 #include "../archive_i.h"
 #include <storage/storage.h>
 
-#define TAB_RIGHT InputKeyRight // Default tab switch direction
+#define TAB_LEFT InputKeyLeft // Default tab switch direction
 #define TAB_DEFAULT ArchiveTabFavorites // Start tab
 #define FILE_LIST_BUF_LEN 50
 
@@ -12,11 +12,13 @@ static const char* tab_default_paths[] = {
     [ArchiveTabIButton] = ANY_PATH("ibutton"),
     [ArchiveTabNFC] = ANY_PATH("nfc"),
     [ArchiveTabSubGhz] = ANY_PATH("subghz"),
+    [ArchiveTabSubGhzRemote] = EXT_PATH("subghz/subghz_remote"),
     [ArchiveTabLFRFID] = ANY_PATH("lfrfid"),
     [ArchiveTabInfrared] = ANY_PATH("infrared"),
     [ArchiveTabBadUsb] = ANY_PATH("badusb"),
     [ArchiveTabU2f] = "/app:u2f",
     [ArchiveTabApplications] = ANY_PATH("apps"),
+    [ArchiveTabInternal] = STORAGE_INT_PATH_PREFIX,
     [ArchiveTabBrowser] = STORAGE_ANY_PATH_PREFIX,
 };
 
@@ -24,6 +26,7 @@ static const char* known_ext[] = {
     [ArchiveFileTypeIButton] = ".ibtn",
     [ArchiveFileTypeNFC] = ".nfc",
     [ArchiveFileTypeSubGhz] = ".sub",
+    [ArchiveFileTypeSubGhzRemote] = ".txt",
     [ArchiveFileTypeLFRFID] = ".rfid",
     [ArchiveFileTypeInfrared] = ".ir",
     [ArchiveFileTypeBadUsb] = ".txt",
@@ -39,11 +42,13 @@ static const ArchiveFileTypeEnum known_type[] = {
     [ArchiveTabIButton] = ArchiveFileTypeIButton,
     [ArchiveTabNFC] = ArchiveFileTypeNFC,
     [ArchiveTabSubGhz] = ArchiveFileTypeSubGhz,
+    [ArchiveTabSubGhzRemote] = ArchiveFileTypeSubGhzRemote,
     [ArchiveTabLFRFID] = ArchiveFileTypeLFRFID,
     [ArchiveTabInfrared] = ArchiveFileTypeInfrared,
     [ArchiveTabBadUsb] = ArchiveFileTypeBadUsb,
     [ArchiveTabU2f] = ArchiveFileTypeU2f,
     [ArchiveTabApplications] = ArchiveFileTypeApplication,
+    [ArchiveTabInternal] = ArchiveFileTypeUnknown,
     [ArchiveTabBrowser] = ArchiveFileTypeUnknown,
 };
 
@@ -60,11 +65,10 @@ static inline const char* archive_get_default_path(ArchiveTabEnum tab) {
 }
 
 inline bool archive_is_known_app(ArchiveFileTypeEnum type) {
-    return (type != ArchiveFileTypeFolder && type != ArchiveFileTypeUnknown);
+    return (type != ArchiveFileTypeUnknown);
 }
 
 bool archive_is_item_in_array(ArchiveBrowserViewModel* model, uint32_t idx);
-bool archive_is_file_list_load_required(ArchiveBrowserViewModel* model);
 void archive_update_offset(ArchiveBrowserView* browser);
 void archive_update_focus(ArchiveBrowserView* browser, const char* target);
 

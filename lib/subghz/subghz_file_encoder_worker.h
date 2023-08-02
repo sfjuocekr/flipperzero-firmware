@@ -2,6 +2,10 @@
 
 #include <furi_hal.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef void (*SubGhzFileEncoderWorkerCallbackEnd)(void* context);
 
 typedef struct SubGhzFileEncoderWorker SubGhzFileEncoderWorker;
@@ -27,6 +31,15 @@ SubGhzFileEncoderWorker* subghz_file_encoder_worker_alloc();
  * @param instance Pointer to a SubGhzFileEncoderWorker instance
  */
 void subghz_file_encoder_worker_free(SubGhzFileEncoderWorker* instance);
+
+/** 
+ * Get a description of the progress.
+ * @param instance Pointer to a SubGhzFileEncoderWorker instance
+ * @param output
+ */
+void subghz_file_encoder_worker_get_text_progress(
+    SubGhzFileEncoderWorker* instance,
+    FuriString* output);
 
 /**
  * Getting the level and duration of the upload to be loaded into DMA.
@@ -59,3 +72,7 @@ void subghz_file_encoder_worker_stop(SubGhzFileEncoderWorker* instance);
  * @return bool - true if running
  */
 bool subghz_file_encoder_worker_is_running(SubGhzFileEncoderWorker* instance);
+
+#ifdef __cplusplus
+}
+#endif

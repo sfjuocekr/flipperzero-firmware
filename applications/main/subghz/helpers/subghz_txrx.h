@@ -84,7 +84,8 @@ SubGhzRadioPreset subghz_txrx_get_preset(SubGhzTxRx* instance);
 void subghz_txrx_get_frequency_and_modulation(
     SubGhzTxRx* instance,
     FuriString* frequency,
-    FuriString* modulation);
+    FuriString* modulation,
+    bool long_name);
 
 /**
  * Start TX CC1101
@@ -334,3 +335,12 @@ const char* subghz_txrx_radio_device_get_name(SubGhzTxRx* instance);
 * @return bool True if the frequency is valid
 */
 bool subghz_txrx_radio_device_is_frequecy_valid(SubGhzTxRx* instance, uint32_t frequency);
+
+bool subghz_txrx_radio_device_is_tx_alowed(SubGhzTxRx* instance, uint32_t frequency);
+
+void subghz_txrx_set_debug_pin_state(SubGhzTxRx* instance, bool state);
+bool subghz_txrx_get_debug_pin_state(SubGhzTxRx* instance);
+
+void subghz_txrx_reset_dynamic_and_custom_btns(SubGhzTxRx* instance);
+
+SubGhzReceiver* subghz_txrx_get_receiver(SubGhzTxRx* instance); // TODO use only in DecodeRaw

@@ -198,6 +198,20 @@ bool subghz_device_cc1101_ext_alloc() {
 
     subghz_device_cc1101_ext->async_rx.capture_delta_duration = 0;
 
+    subghz_device_cc1101_ext->spi_bus_handle =
+        (CFW_SETTINGS()->spi_cc1101_handle == SpiDefault ?
+             &furi_hal_spi_bus_handle_external :
+             &furi_hal_spi_bus_handle_external_extra);
+
+    // this is needed if multiple SPI devices are connected to the same bus but with differe>
+    if(CFW_SETTINGS()->spi_cc1101_handle == SpiDefault) {
+        furi_hal_gpio_init_simple(&gpio_ext_pc3, GpioModeOutputPushPull);
+        furi_hal_gpio_write(&gpio_ext_pc3, true);
+    } else if(CFW_SETTINGS()->spi_cc1101_handle == SpiExtra) {
+        furi_hal_gpio_init_simple(&gpio_ext_pa4, GpioModeOutputPushPull);
+        furi_hal_gpio_write(&gpio_ext_pa4, true);
+    }
+
     furi_hal_spi_bus_handle_init(subghz_device_cc1101_ext->spi_bus_handle);
     return subghz_device_cc1101_ext_check_init();
 }
@@ -207,6 +221,13 @@ void subghz_device_cc1101_ext_free() {
     furi_hal_spi_bus_handle_deinit(subghz_device_cc1101_ext->spi_bus_handle);
     free(subghz_device_cc1101_ext);
     subghz_device_cc1101_ext = NULL;
+
+    // resetting the CS pins to floating
+    if(CFW_SETTINGS()->spi_nrf24_handle == SpiDefault) {
+        furi_hal_gpio_init_simple(&gpio_ext_pc3, GpioModeAnalog);
+    } else if(CFW_SETTINGS()->spi_nrf24_handle == SpiExtra) {
+        furi_hal_gpio_init_simple(&gpio_ext_pa4, GpioModeAnalog);
+    }
 }
 
 void subghz_device_cc1101_ext_set_async_mirror_pin(const GpioPin* pin) {

@@ -2,6 +2,8 @@
 
 #include "registry.h"
 
+#include <subghz/subghz_last_settings.h>
+
 void subghz_devices_init() {
     furi_check(!subghz_device_registry_is_valid());
     subghz_device_registry_init();
@@ -10,6 +12,9 @@ void subghz_devices_init() {
 void subghz_devices_deinit(void) {
     furi_check(subghz_device_registry_is_valid());
     subghz_device_registry_deinit();
+    if(furi_hal_subghz_get_ext_power_amp()) {
+        furi_hal_gpio_init_simple(&gpio_ext_pc3, GpioModeAnalog);
+    }
 }
 
 const SubGhzDevice* subghz_devices_get_by_name(const char* device_name) {
@@ -30,7 +35,13 @@ bool subghz_devices_begin(const SubGhzDevice* device) {
     bool ret = false;
     furi_assert(device);
     if(device->interconnect->begin) {
-        ret = device->interconnect->begin();
+        SubGhzDeviceConf conf = {
+            .ver = 1,
+            .extended_range = false, // TODO
+            .power_amp = furi_hal_subghz_get_ext_power_amp(),
+        };
+
+        ret = device->interconnect->begin(&conf);
     }
     return ret;
 }
@@ -222,6 +233,7 @@ bool subghz_devices_is_rx_data_crc_valid(const SubGhzDevice* device) {
 }
 
 void subghz_devices_read_packet(const SubGhzDevice* device, uint8_t* data, uint8_t* size) {
+    furi_assert(device);
     furi_assert(device);
     if(device->interconnect->read_packet) {
         device->interconnect->read_packet(data, size);

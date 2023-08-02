@@ -229,6 +229,7 @@ vars.AddVariables(
             ("applications/external", False),
             ("applications/examples", False),
             ("applications/drivers", False),
+            ("applications_custom", False),
             ("applications_user", False),
         ],
     ),

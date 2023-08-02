@@ -64,7 +64,8 @@ const SubGhzProtocol subghz_protocol_magellan = {
     .name = SUBGHZ_PROTOCOL_MAGELLAN_NAME,
     .type = SubGhzProtocolTypeStatic,
     .flag = SubGhzProtocolFlag_433 | SubGhzProtocolFlag_AM | SubGhzProtocolFlag_Decodable |
-            SubGhzProtocolFlag_Load | SubGhzProtocolFlag_Save | SubGhzProtocolFlag_Send,
+            SubGhzProtocolFlag_Load | SubGhzProtocolFlag_Save | SubGhzProtocolFlag_Send |
+            SubGhzProtocolFlag_Magelan,
 
     .decoder = &subghz_protocol_magellan_decoder,
     .encoder = &subghz_protocol_magellan_encoder,
@@ -385,7 +386,7 @@ static void subghz_protocol_magellan_get_event_serialize(uint8_t event, FuriStri
         ((event >> 2) & 0x1 ? ", ?" : ""),
         ((event >> 3) & 0x1 ? ", Power On" : ""),
         ((event >> 4) & 0x1 ? ", MT:Wireless_Reed" : ""),
-        ((event >> 5) & 0x1 ? ", MT:Motion_Sensor" : ""),
+        ((event >> 5) & 0x1 ? ", MT:Motion_\nSensor" : ""),
         ((event >> 6) & 0x1 ? ", ?" : ""),
         ((event >> 7) & 0x1 ? ", ?" : ""));
 }
